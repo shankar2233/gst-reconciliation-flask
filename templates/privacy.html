@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="fade-in-up">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="mb-0">
+                <i class="fas fa-shield-alt me-2"></i>Privacy Policy
+            </h2>
+        </div>
+        <div class="card-body">
+            <h4 class="text-primary mb-3">Data Security & Privacy</h4>
+            
+            <h5>Information We Collect</h5>
+            <p>We only process the Excel files you upload for reconciliation purposes. No personal data is stored permanently on our servers.</p>
+            
+            <h5>How We Use Your Data</h5>
+            <ul>
+                <li>Process GST reconciliation between Tally and GSTR-2A data</li>
+                <li>Generate reconciliation reports</li>
+                <li>Provide analytical insights</li>
+            </ul>
+            
+            <h5>Data Protection</h5>
+            <ul>
+                <li>All uploaded files are processed in-memory</li>
+                <li>Files are automatically deleted after processing</li>
+                <li>No data is shared with third parties</li>
+                <li>Secure HTTPS connection for all transfers</li>
+            </ul>
+            
+            <h5>Your Rights</h5>
+            <p>You have full control over your data. All processing is done locally and temporarily for reconciliation purposes only.</p>
+            
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Note:</strong> This tool processes data locally and does not store any information permanently.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

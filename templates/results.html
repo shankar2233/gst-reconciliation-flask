@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="fade-in-up">
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="stat-card primary">
+                <h3>{{ results.summary.total_tally_records }}</h3>
+                <p><i class="fas fa-file-alt me-1"></i>Tally Records</p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="stat-card info">
+                <h3>{{ results.summary.total_gstr_records }}</h3>
+                <p><i class="fas fa-file-invoice me-1"></i>GSTR Records</p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="stat-card success">
+                <h3>{{ results.summary.matched_records }}</h3>
+                <p><i class="fas fa-check-circle me-1"></i>Matched</p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="stat-card warning">
+                <h3>{{ results.summary.discrepancies }}</h3>
+                <p><i class="fas fa-exclamation-triangle me-1"></i>Discrepancies</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Match Percentage -->
+    <div class="card mb-4">
+        <div class="card-body text-center">
+            <h4 class="text-primary mb-3">
+                <i class="fas fa-chart-pie me-2"></i>Match Percentage: {{ results.summary.match_percentage }}%
+            </h4>
+            <div class="progress" style="height: 2rem;">
+                <div class="progress-bar" role="progressbar" style="width: {{ results.summary.match_percentage }}%">
+                    {{ results.summary.match_percentage }}%
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Message -->
+    <div class="alert alert-success">
+        <h5><i class="fas fa-check-circle me-2"></i>All reconciliation processes completed successfully!</h5>
+        <p class="mb-2">You can now download the complete report with all analysis results.</p>
+        <a href="{{ url_for('download_report') }}" class="btn btn-success">
+            <i class="fas fa-download me-2"></i>Download Complete Report
+        </a>
+    </div>
+
+    <!-- Results Tabs -->
+    <div class="card">
+        <div class="card-body">
+            <ul class="nav nav-tabs mb-4" id="resultsTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="matched-tab" data-bs-toggle="tab" data-bs-target="#matched" type="button">
+                        <i class="fas fa-check-circle me-1"></i>Matched ({{ results.matched_records|length }})
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="discrepancies-tab" data-bs-toggle="tab" data-bs-target="#discrepancies" type="button">
+                        <i class="fas fa-exclamation-triangle me-1"></i>Discrepancies ({{ results.discrepancies|length }})
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="unmatched-tally-tab" data-bs-toggle="tab" data-bs-target="#unmatched-tally" type="button">
+                        <i class="fas fa-file-alt me-1"></i>Unmatched Tally ({{ results.unmatched_tally|length }})
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="unmatched-gstr-tab" data-bs-toggle="tab" data-bs-target="#unmatched-gstr" type="button">
+                        <i class="fas fa-file-invoice me-1"></i>Unmatched GSTR ({{ results.unmatched_gstr|length }})
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="resultsTabsContent">
+                <!-- Matched Records -->
+                <div class="tab-pane fade show active" id="matched" role="tabpanel">
+                    {% if results.matched_records %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>GSTIN</th>
+                                    <th>Supplier (Tally)</th>
+                                    <th>Supplier (GSTR)</th>
+                                    <th>Invoice Number</th>
+                                    <th>Tally Value</th>
+                                    <th>GSTR Value</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in results.matched_records %}
+                                <tr>
+                                    <td><code>{{ record.gstin }}</code></td>
+                                    <td>{{ record.supplier_tally }}</td>
+                                    <td>{{ record.supplier_gstr }}</td>
+                                    <td><strong>{{ record.invoice_number }}</strong></td>
+                                    <td class="text-end">₹{{ "{:,.2f}".format(record.tally_value) }}</td>
+                                    <td class="text-end">₹{{ "{:,.2f}".format(record.gstr_value) }}</td>
+                                    <td><span class="badge bg-success">{{ record.status }}</span></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No matched records found</h5>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Discrepancies -->
+                <div class="tab-pane fade" id="discrepancies" role="tabpanel">
+                    {% if results.discrepancies %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>GSTIN</th>
+                                    <th>Supplier (Tally)</th>
+                                    <th>Supplier (GSTR)</th>
+                                    <th>Invoice Number</th>
+                                    <th>Tally Value</th>
+                                    <th>GSTR Value</th>
+                                    <th>Discrepancy Details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in results.discrepancies %}
+                                <tr>
+                                    <td><code>{{ record.gstin }}</code></td>
+                                    <td>{{ record.supplier_tally }}</td>
+                                    <td>{{ record.supplier_gstr }}</td>
+                                    <td><strong>{{ record.invoice_number }}</strong></td>
+                                    <td class="text-end">₹{{ "{:,.2f}".format(record.tally_value) }}</td>
+                                    <td class="text-end">₹{{ "{:,.2f}".format(record.gstr_value) }}</td>
+                                    <td>
+                                        {% if record.discrepancy_details %}
+                                            {% for detail in record.discrepancy_details %}
+                                                <small class="badge bg-warning text-dark d-block mb-1">{{ detail }}</small>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                        <h5 class="text-success">No discrepancies found!</h5>
+                        <p class="text-muted">All matched records have consistent values.</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Unmatched Tally -->
+                <div class="tab-pane fade" id="unmatched-tally" role="tabpanel">
+                    {% if results.unmatched_tally %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>GSTIN</th>
+                                    <th>Supplier</th>
+                                    <th>Invoice Number</th>
+                                    <th>Invoice Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in results.unmatched_tally %}
+                                <tr>
+                                    <td><code>{{ record.gstin }}</code></td>
+                                    <td>{{ record.supplier }}</td>
+                                    <td><strong>{{ record.invoice_number }}</strong></td>
+                                    <td class="text-end">₹{{ "{:,.2f}".format(record.invoice_value) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                        <h5 class="text-success">All Tally records matched!</h5>
+                        <p class="text-muted">Every record from Tally was found in GSTR-2A.</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Unmatched GSTR -->
+                <div class="tab-pane fade" id="unmatched-gstr" role="tabpanel">
+                    {% if results.unmatched_gstr %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>GSTIN</th>
+                                    <th>Supplier</th>
+                                    <th>Invoice Number</th>
+                                    <th>Invoice Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in results.unmatched_gstr %}
+                                <tr>
+                                    <td><code>{{ record.gstin }}</code></td>
+                                    <td>{{ record.supplier }}</td>
+                                    <td><strong>{{ record.invoice_number }}</strong></td>
+                                    <td class="text-end">₹{{ "{:,.2f}".format(record.invoice_value) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                        <h5 class="text-success">All GSTR records matched!</h5>
+                        <p class="text-muted">Every record from GSTR-2A was found in Tally.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="text-center mt-4">
+        <a href="{{ url_for('download_report') }}" class="btn btn-success btn-lg me-3">
+            <i class="fas fa-download me-2"></i>Download Complete Report
+        </a>
+        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-lg">
+            <i class="fas fa-arrow-left me-2"></i>Process Another File
+        </a>
+    </div>
+</div>
+{% endblock %}

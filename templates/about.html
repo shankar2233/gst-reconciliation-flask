@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="fade-in-up">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="mb-0">
+                <i class="fas fa-info-circle me-2"></i>About GST Reconciliation Tool
+            </h2>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <h4 class="text-primary mb-3">What is GST Reconciliation?</h4>
+                    <p class="lead">
+                        GST Reconciliation is the process of matching your purchase records (from Tally) 
+                        with the supplier data available in GSTR-2A to ensure accuracy and compliance.
+                    </p>
+                    
+                    <h5 class="text-primary mt-4 mb-3">Key Features</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>AI-powered matching</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Automatic discrepancy detection</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Comprehensive reporting</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Excel export functionality</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Real-time processing</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Secure data handling</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h5 class="text-primary mt-4 mb-3">How It Works</h5>
+                    <ol>
+                        <li class="mb-2">Upload your Tally export and GSTR-2A data in Excel format</li>
+                        <li class="mb-2">Our AI engine processes and matches the records based on GSTIN and Invoice Number</li>
+                        <li class="mb-2">Identify matched records, discrepancies, and unmatched entries</li>
+                        <li class="mb-2">Download detailed reconciliation report for further analysis</li>
+                    </ol>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card info text-center">
+                        <h3>99.9%</h3>
+                        <p>Accuracy Rate</p>
+                    </div>
+                    <div class="stat-card success text-center mt-3">
+                        <h3>< 30s</h3>
+                        <p>Processing Time</p>
+                    </div>
+                    <div class="stat-card warning text-center mt-3">
+                        <h3>100%</h3>
+                        <p>Data Security</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

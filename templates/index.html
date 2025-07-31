@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <!-- Upload Section -->
+        <div class="card mb-4 fade-in-up">
+            <div class="card-header">
+                <h3 class="mb-0">
+                    <i class="fas fa-upload me-2"></i>Upload GST Reconciliation File
+                </h3>
+                <p class="mb-0 mt-2">Upload one Excel file containing both Tally and GSTR-2A sheets</p>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data" id="uploadForm">
+                    <div class="row mb-4">
+                        <div class="col-md-8 mx-auto">
+                            <!-- Single File Upload Area -->
+                            <div class="upload-area text-center p-4 mb-3">
+                                <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
+                                <h5 class="text-primary mb-2">Drop your Excel file here</h5>
+                                <p class="text-muted mb-3">Or click to browse files</p>
+                                <input type="file" class="form-control form-control-lg" id="gst_file" name="gst_file" accept=".xlsx,.xls" required>
+                            </div>
+                            
+                            <div class="alert alert-info">
+                                <h6><i class="fas fa-info-circle me-2"></i>File Requirements:</h6>
+                                <ul class="mb-0">
+                                    <li><strong>Format:</strong> Excel (.xlsx or .xls)</li>
+                                    <li><strong>Sheets Required:</strong> "Tally" and "GSTR-2A"</li>
+                                    <li><strong>Max Size:</strong> 16MB</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary btn-lg me-3">
+                            <i class="fas fa-magic me-2"></i>Start Reconciliation
+                        </button>
+                        <a href="{{ url_for('download_sample') }}" class="btn btn-outline-secondary btn-lg">
+                            <i class="fas fa-download me-2"></i>Download Sample Format
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- File Structure Info -->
+        <div class="card mb-4 fade-in-up">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-file-excel me-2"></i>Required File Structure
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="text-center mb-4">
+                            <div class="p-3 bg-light rounded">
+                                <i class="fas fa-file-excel fa-2x text-success mb-2"></i>
+                                <h6>📄 Your Excel File</h6>
+                                <small class="text-muted">Single file with multiple sheets</small>
+                            </div>
+                        </div>
+                        
+                        <div class="ps-3">
+                            <h6 class="text-primary mb-2">
+                                <i class="fas fa-layer-group me-1"></i>Required Sheets:
+                            </h6>
+                            <div class="mb-3">
+                                <span class="badge bg-success fs-6 py-2 px-3 me-2">Sheet 1: Tally</span>
+                                <small class="text-muted d-block">Your Tally data export</small>
+                            </div>
+                            <div class="mb-3">
+                                <span class="badge bg-info fs-6 py-2 px-3 me-2">Sheet 2: GSTR-2A</span>
+                                <small class="text-muted d-block">Your GSTR-2A portal data</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-columns me-1"></i>Required Columns (Both Sheets):
+                        </h6>
+                        <div class="row">
+                            <div class="col-12">
+                                <ul class="list-unstyled small">
+                                    <li><i class="fas fa-check text-success me-1"></i> GSTIN of supplier</li>
+                                    <li><i class="fas fa-check text-success me-1"></i> Supplier</li>
+                                    <li><i class="fas fa-check text-success me-1"></i> Invoice number</li>
+                                    <li><i class="fas fa-check text-success me-1"></i> Invoice Date</li>
+                                    <li><i class="fas fa-check text-success me-1"></i> Invoice Value</li>
+                                    <li><i class="fas fa-check text-success me-1"></i> Taxable Value</li>
+                                    <li><i class="fas fa-check text-success me-1"></i> Rate</li>
+                                    <li><i class="fas fa-check text-success me-1"></i> Integrated Tax</li>
+                                    <li><i class="fas fa-check text-success me-1"></i> Central Tax</li>
+                                    <li><i class="fas fa-check text-success me-1"></i> State/UT tax</li>
+                                    <li><i class="fas fa-check text-success me-1"></i> Cess</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning mt-3">
+                    <h6><i class="fas fa-exclamation-triangle me-2"></i>Important Notes:</h6>
+                    <ul class="mb-0">
+                        <li>Sheet names must be exactly <strong>"Tally"</strong> and <strong>"GSTR-2A"</strong></li>
+                        <li>Column headers must match the required format</li>
+                        <li>Data should start from row 2 (headers in row 1)</li>
+                        <li>Remove any summary rows or totals from the top</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="card fade-in-up">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-list-ol me-2"></i>How to Use
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-primary">📋 Step 1: Prepare Your File</h6>
+                        <ul class="list-unstyled ps-3">
+                            <li><i class="fas fa-arrow-right text-success me-2"></i>Create one Excel file</li>
+                            <li><i class="fas fa-arrow-right text-success me-2"></i>Add "Tally" sheet with your Tally data</li>
+                            <li><i class="fas fa-arrow-right text-success me-2"></i>Add "GSTR-2A" sheet with portal data</li>
+                            <li><i class="fas fa-arrow-right text-success me-2"></i>Ensure columns match required format</li>
+                        </ul>
+
+                        <h6 class="text-primary">🔍 Step 2: Upload & Process</h6>
+                        <ul class="list-unstyled ps-3">
+                            <li><i class="fas fa-arrow-right text-success me-2"></i>Select your prepared Excel file</li>
+                            <li><i class="fas fa-arrow-right text-success me-2"></i>Click "Start Reconciliation"</li>
+                            <li><i class="fas fa-arrow-right text-success me-2"></i>Wait for AI processing</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-primary">📊 Step 3: Review Results</h6>
+                        <ul class="list-unstyled ps-3">
+                            <li><i class="fas fa-arrow-right text-success me-2"></i>View reconciliation summary</li>
+                            <li><i class="fas fa-arrow-right text-success me-2"></i>Analyze discrepancies</li>
+                            <li><i class="fas fa-arrow-right text-success me-2"></i>Check unmatched records</li>
+                        </ul>
+
+                        <h6 class="text-primary">📥 Step 4: Download Report</h6>
+                        <ul class="list-unstyled ps-3">
+                            <li><i class="fas fa-arrow-right text-success me-2"></i>Get detailed Excel report</li>
+                            <li><i class="fas fa-arrow-right text-success me-2"></i>Share with your team</li>
+                            <li><i class="fas fa-arrow-right text-success me-2"></i>Take corrective actions</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Enhanced file upload with drag and drop
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadArea = document.querySelector('.upload-area');
+    const fileInput = document.getElementById('gst_file');
+    const form = document.getElementById('uploadForm');
+
+    // Drag and drop functionality
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight(e) {
+        uploadArea.classList.add('dragover');
+        uploadArea.style.borderColor = '#28a745';
+        uploadArea.style.backgroundColor = 'rgba(40, 167, 69, 0.1)';
+    }
+
+    function unhighlight(e) {
+        uploadArea.classList.remove('dragover');
+        uploadArea.style.borderColor = '#ddd';
+        uploadArea.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+    }
+
+    uploadArea.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        
+        if (files.length > 0) {
+            fileInput.files = files;
+            showFileInfo(files[0]);
+        }
+    }
+
+    // Click to upload
+    uploadArea.addEventListener('click', () => {
+        fileInput.click();
+    });
+
+    fileInput.addEventListener('change', function() {
+        if (this.files.length > 0) {
+            showFileInfo(this.files[0]);
+        }
+    });
+
+    function showFileInfo(file) {
+        const uploadArea = document.querySelector('.upload-area');
+        uploadArea.innerHTML = `
+            <i class="fas fa-file-excel fa-3x text-success mb-3"></i>
+            <h5 class="text-success mb-2">File Selected!</h5>
+            <p class="mb-0"><strong>${file.name}</strong></p>
+            <small class="text-muted">Size: ${(file.size / 1024 / 1024).toFixed(2)} MB</small>
+            <div class="mt-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="location.reload()">
+                    <i class="fas fa-times me-1"></i>Remove
+                </button>
+            </div>
+        `;
+    }
+
+    // Form submission
+    form.addEventListener('submit', function() {
+        const submitBtn = this.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+            submitBtn.disabled = true;
+        }
+    });
+});
+</script>
+{% endblock %}

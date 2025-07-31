@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}🔍 GST Reconciliation Tool{% endblock %}</title>
+    
+    <!-- Meta Tags -->
+    <meta name="description" content="Advanced AI-powered reconciliation between Tally and GSTR-2A data">
+    <meta name="keywords" content="GST, Reconciliation, Tally, GSTR-2A, Tax, Invoice">
+    <meta name="author" content="GST Reconciliation Tool">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔍</text></svg>">
+    
+    <!-- CSS Libraries -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #ff4b4b;
+            --primary-gradient: linear-gradient(135deg, #ff4b4b 0%, #ff6b6b 100%);
+            --success-color: #00d4aa;
+            --success-gradient: linear-gradient(135deg, #00d4aa 0%, #00c494 100%);
+            --warning-color: #ffbd45;
+            --warning-gradient: linear-gradient(135deg, #ffbd45 0%, #ffa726 100%);
+            --info-color: #29b6f6;
+            --info-gradient: linear-gradient(135deg, #29b6f6 0%, #039be5 100%);
+            --dark-color: #262730;
+            --light-color: #fafafa;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        /* Streamlit-style Header */
+        .main-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--box-shadow);
+        }
+
+        .main-header h1 {
+            color: var(--primary-color);
+            font-weight: 800;
+            font-size: 2rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .main-header p {
+            color: #666;
+            margin: 0.5rem 0 0 0;
+            font-size: 1rem;
+        }
+
+        /* Navigation Menu */
+        .nav-pills {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 0.5rem;
+            box-shadow: var(--box-shadow);
+            margin: 2rem 0;
+        }
+
+        .nav-pills .nav-link {
+            border-radius: calc(var(--border-radius) - 4px);
+            color: var(--dark-color);
+            font-weight: 500;
+            padding: 0.75rem 1.5rem;
+            transition: var(--transition);
+            margin: 0 0.25rem;
+        }
+
+        .nav-pills .nav-link.active {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 75, 75, 0.3);
+        }
+
+        .nav-pills .nav-link:hover:not(.active) {
+            background: rgba(255, 75, 75, 0.1);
+            color: var(--primary-color);
+        }
+
+        /* Cards */
+        .card {
+            border: none;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            background: white;
+            transition: var(--transition);
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 1.5rem;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        /* Buttons - Streamlit Style */
+        .btn {
+            border-radius: var(--border-radius);
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            border: none;
+            transition: var(--transition);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 75, 75, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 75, 75, 0.4);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success-gradient);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 212, 170, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 212, 170, 0.4);
+            color: white;
+        }
+
+        .btn-outline-secondary {
+            background: white;
+            color: var(--dark-color);
+            border: 2px solid #e0e0e0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-outline-secondary:hover {
+            background: #f8f9fa;
+            border-color: #d0d0d0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            color: var(--dark-color);
+        }
+
+        /* Form Controls */
+        .form-control, .form-select {
+            border: 2px solid #e0e0e0;
+            border-radius: var(--border-radius);
+            padding: 0.75rem 1rem;
+            transition: var(--transition);
+            font-size: 0.95rem;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(255, 75, 75, 0.1);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Alerts - Streamlit Style */
+        .alert {
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-left: 4px solid;
+        }
+
+        .alert-success {
+            background: rgba(0, 212, 170, 0.1);
+            color: #00a085;
+            border-left-color: var(--success-color);
+        }
+
+        .alert-danger {
+            background: rgba(255, 75, 75, 0.1);
+            color: #cc3333;
+            border-left-color: var(--primary-color);
+        }
+
+        .alert-info {
+            background: rgba(41, 182, 246, 0.1);
+            color: #0277bd;
+            border-left-color: var(--info-color);
+        }
+
+        .alert-warning {
+            background: rgba(255, 189, 69, 0.1);
+            color: #e65100;
+            border-left-color: var(--warning-color);
+        }
+
+        /* Progress Bars */
+        .progress {
+            height: 1rem;
+            border-radius: calc(var(--border-radius) / 2);
+            background: rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: var(--success-gradient);
+            border-radius: calc(var(--border-radius) / 2);
+            transition: width 1.5s ease-in-out;
+        }
+
+        /* Tables */
+        .table {
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            background: white;
+        }
+
+        .table th {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 1rem;
+            font-weight: 600;
+        }
+
+        .table td {
+            padding: 1rem;
+            border-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .table tbody tr:hover {
+            background: rgba(255, 75, 75, 0.05);
+        }
+
+        /* Stats Cards */
+        .stat-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            text-align: center;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            border-left: 4px solid;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card.primary { border-left-color: var(--primary-color); }
+        .stat-card.success { border-left-color: var(--success-color); }
+        .stat-card.warning { border-left-color: var(--warning-color); }
+        .stat-card.info { border-left-color: var(--info-color); }
+
+        .stat-card h3 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 0;
+            color: var(--dark-color);
+        }
+
+        .stat-card p {
+            margin: 0.5rem 0 0 0;
+            color: #666;
+            font-weight: 500;
+        }
+
+        /* Tabs */
+        .nav-tabs {
+            border: none;
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 0.5rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .nav-tabs .nav-link {
+            border: none;
+            border-radius: calc(var(--border-radius) - 4px);
+            color: var(--dark-color);
+            font-weight: 500;
+            padding: 0.75rem 1.5rem;
+            margin: 0 0.25rem;
+            transition: var(--transition);
+        }
+
+        .nav-tabs .nav-link.active {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .nav-tabs .nav-link:hover:not(.active) {
+            background: rgba(255, 75, 75, 0.1);
+            color: var(--primary-color);
+        }
+
+        /* Upload Area */
+        .upload-area {
+            border: 3px dashed #ddd;
+            border-radius: var(--border-radius);
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: var(--transition);
+            background: rgba(255, 255, 255, 0.9);
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background: rgba(255, 75, 75, 0.05);
+        }
+
+        .upload-area.dragover {
+            border-color: var(--success-color);
+            background: rgba(0, 212, 170, 0.05);
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(38, 39, 48, 0.95);
+            color: white;
+            padding: 3rem 0 2rem 0;
+            margin-top: 4rem;
+            backdrop-filter: blur(20px);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .card-body {
+                padding: 1.5rem;
+            }
+            
+            .btn {
+                padding: 0.6rem 1.5rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Container */
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            margin: 2rem auto;
+            padding: 2rem;
+            box-shadow: var(--box-shadow);
+            max-width: 1200px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Main Header -->
+    <div class="main-header">
+        <div class="container">
+            <h1>
+                🔍 GST Reconciliation Tool
+            </h1>
+            <p>Advanced AI-powered reconciliation between Tally and GSTR-2A data</p>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="container">
+        <ul class="nav nav-pills justify-content-center">
+            <li class="nav-item">
+                <a class="nav-link {{ 'active' if request.endpoint == 'index' }}" href="{{ url_for('index') }}">
+                    <i class="fas fa-home"></i> Home
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ 'active' if request.endpoint == 'results' }}" href="{{ url_for('results') }}">
+                    <i class="fas fa-chart-bar"></i> Results
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ 'active' if request.endpoint == 'analytics' }}" href="{{ url_for('analytics') }}">
+                    <i class="fas fa-analytics"></i> Analytics
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ 'active' if request.endpoint == 'about' }}" href="{{ url_for('about') }}">
+                    <i class="fas fa-info-circle"></i> About
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ 'active' if request.endpoint == 'contact' }}" href="{{ url_for('contact') }}">
+                    <i class="fas fa-envelope"></i> Contact
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="container">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        <i class="fas fa-{{ 'exclamation-circle' if category == 'error' else 'check-circle' if category == 'success' else 'info-circle' }}"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <div class="main-container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>🔍 GST Reconciliation Tool</h5>
+                    <p>Advanced AI-powered reconciliation between Tally and GSTR-2A data</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p>&copy; 2024 GST Reconciliation Tool. All rights reserved.</p>
+                    <div class="mt-2">
+                        <a href="{{ url_for('privacy') }}" class="text-light me-3">Privacy Policy</a>
+                        <a href="{{ url_for('contact') }}" class="text-light">Contact Us</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto-dismiss alerts
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                setTimeout(function() {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }, 5000);
+            });
+
+            // Add fade-in animation to all cards
+            const cards = document.querySelectorAll('.card, .stat-card');
+            cards.forEach(function(card, index) {
+                card.style.animationDelay = `${index * 0.1}s`;
+                card.classList.add('fade-in-up');
+            });
+
+            // File upload drag and drop
+            const uploadAreas = document.querySelectorAll('.upload-area');
+            uploadAreas.forEach(function(area) {
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    area.addEventListener(eventName, preventDefaults, false);
+                });
+
+                function preventDefaults(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+
+                ['dragenter', 'dragover'].forEach(eventName => {
+                    area.addEventListener(eventName, highlight, false);
+                });
+
+                ['dragleave', 'drop'].forEach(eventName => {
+                    area.addEventListener(eventName, unhighlight, false);
+                });
+
+                function highlight(e) {
+                    area.classList.add('dragover');
+                }
+
+                function unhighlight(e) {
+                    area.classList.remove('dragover');
+                }
+            });
+        });
+
+        // Progress bar animation
+        function animateProgressBar(element, targetWidth) {
+            element.style.width = '0%';
+            setTimeout(() => {
+                element.style.width = targetWidth + '%';
+            }, 100);
+        }
+
+        // Counter animation
+        function animateCounter(element, target) {
+            let current = 0;
+            const increment = target / 100;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.round(current);
+            }, 20);
+        }
+
+        // Initialize animations on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate progress bars
+            const progressBars = document.querySelectorAll('.progress-bar');
+            progressBars.forEach(function(bar) {
+                const width = bar.getAttribute('style')?.match(/width:\s*(\d+)%/);
+                if (width) {
+                    animateProgressBar(bar, parseInt(width[1]));
+                }
+            });
+
+            // Animate counters
+            const counters = document.querySelectorAll('.stat-card h3');
+            counters.forEach(function(counter) {
+                const target = parseInt(counter.textContent);
+                if (!isNaN(target)) {
+                    animateCounter(counter, target);
+                }
+            });
+        });
+    </script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>
